@@ -5,14 +5,21 @@
 
 from setuptools import setup, find_packages
 
-with open('README.rst') as readme_file:
-    readme = readme_file.read()
+requirements = [
+    'pandas',
+    'PyYAML',
+    'pyodbc',
+    'exasol',
+    'snowflake-connector-python',
+]
+setup_requirements = [
+    'pytest-runner',
+]
 
-requirements = [ ]
-
-setup_requirements = ['pytest-runner', ]
-
-test_requirements = ['pytest', ]
+test_requirements = [
+    'pytest',
+    'mock',
+]
 
 setup(
     author="Samuel Luen-English",
@@ -30,17 +37,15 @@ setup(
     ],
     description="DBio, an abstraction around various database technologies.",
     install_requires=requirements,
-    long_description=readme,
     include_package_data=True,
     keywords='dbio',
     name='dbio',
     packages=find_packages(include=['dbio']),
-    setup_requires=[
-    ],
+    setup_requires=setup_requirements,
     test_suite='tests',
-    tests_require=[
+    tests_require=test_requirements,
+    dependency_links=[
+        "https://github.com/EXASOL/python-exasol/tarball/master#egg=EXASOL-python-exasol-2e3b883",
     ],
-    url='https://github.com/sluenenglish/dbio',
     version='0.0.0',
-    zip_safe=False,
 )
