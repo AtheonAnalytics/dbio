@@ -44,8 +44,5 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    dependency_links=[
-        "https://github.com/EXASOL/python-exasol/tarball/master#egg=EXASOL-python-exasol-2e3b883",
-    ],
     version='0.0.0',
 )
