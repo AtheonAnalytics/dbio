@@ -1,71 +1,98 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import csv
-import os
 import tempfile
 from contextlib import contextmanager
 
 import pandas as pd
-import yaml
-
-import dbio
-
-def get_config(connection_name, key):
-    config_file = os.environ.get('DBIO_CONFIG_FILE', '~/.dbio_conf')
-    with open(config_file, 'r') as f:
-        data = yaml.load(f)
-    try:
-        data = data['dbio-conf']
-    except KeyError as e:
-        raise MisconfigurationException('"dbio-conf" key not found in config file.')
-
-    try:
-        conn_conf = data[connection_name]
-    except KeyError as e:
-        raise MisconfigurationException('Connection name not found in config file.')
-
-    try:
-        return conn_conf[key]
-    except KeyError as e:
-        raise MisconfigurationException('Value of "{}" not found in config.'.format(key))
-
-
-def db_connection(connection_name):
-    conn_type = get_config(connection_name, 'type')
-    type_lookup = {
-        'exasol': dbio.ExasolConnection,
-        'snowflake': dbio.SnowflakeConnection,
-    }
-    return type_lookup[conn_type](connection_name)
 
 
 class DBConnection(object):
+    """
+    Base db connection.
+
+    """
 
     def __init__(self, connection_name):
-
         self.connection_name = connection_name
 
-    def _connect(self, *args, **kwargs):
+    def _connect(self):
+        """
+        Abstract method to connect to databases.
+
+        Returns:
+            Database connection object
+
+        """
         raise NotImplementedError
 
     def write_csv(self, file_path, table, schema):
+        """
+        Abstract method to write csv to database.
+
+        Args:
+            file_path(str): path to file
+            table(str): table in db
+            schema(str): schema in db
+
+        """
         raise NotImplementedError
 
     def write_pandas(self, data_frame, table, schema):
+        """
+        Write pandas dataframe to database.
 
+        Utilises write_csv method, but can be overwritten if db technology offers more efficient way.
+
+        Args:
+            data_frame(pandas dataframe): dataframe to write.
+            table(str): table in db
+            schema(str): schema in db
+
+        """
         with tempfile.NamedTemporaryFile() as temp_file:
-            data_frame.to_csv(temp_file, index=False, header=None, quoting=csv.QUOTE_MINIMAL)
+            data_frame.to_csv(temp_file, index=False, header=None, quoting=csv.QUOTE_MINIMAL, encoding='utf8')
             temp_file.flush()
             self.write_csv(temp_file.name, table, schema)
 
     def read(self, schema, query):
+        """
+        Abstract method to read from database.
+
+        Args:
+            schema(str): schema in db
+            query(str): db query
+
+
+        Returns:
+            list
+
+        """
         raise NotImplementedError
 
     def read_pandas(self, *args, **kwargs):
+        """
+        Make query and return as pandas dataframe.
+
+        Takes same arguments as self.read.
+
+        Returns:
+            pandas dataframe
+
+        """
         return pd.DataFrame(self.read(*args, **kwargs))
 
     @contextmanager
     def connection(self):
+        """
+        Connection context manager.
+
+        Closes and commits and exit.
+
+        Returns:
+            connection obj
+
+        """
         conn = self._connect()
         yield conn
         conn.commit()
@@ -77,11 +104,10 @@ class DBConnection(object):
         Context manager to give access to db cursor,
         automatically closing connection after and committing changes.
 
+        Returns:
+            cursor obj
+
         """
         with self.connection() as conn:
             cursor = conn.cursor()
             yield cursor
-
-
-class MisconfigurationException(Exception):
-    pass

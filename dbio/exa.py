@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import exasol
 
-from dbio.base import DBConnection, get_config
+from dbio.base import DBConnection
+from dbio.utils import get_config
 
 
 class ExasolConnection(DBConnection):
