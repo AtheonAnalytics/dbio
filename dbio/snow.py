@@ -38,5 +38,6 @@ class SnowflakeConnection(DBConnection):
     def read(self, schema, query):
         with self.cursor() as cursor:
             cursor.execute('use database {}'.format(schema))
-            results = cursor.execute(query)
-            return results.fetchall()
+            cursor.execute(query)
+            fields = map(lambda x: x[0], cursor.description)
+            return [dict(zip(fields, row)) for row in cursor.fetchall()]

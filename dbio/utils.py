@@ -17,7 +17,10 @@ def get_config(connection_name, key):
         str: config value
 
     """
-    config_file = os.environ.get('DBIO_CONFIG_FILE', '~/.dbio_conf')
+    config_file = os.environ.get('DBIO_CONFIG_FILE')
+    if not config_file:
+        raise MisconfigurationException('DBIO_CONFIG_FILE environment variable not set')
+
     with open(config_file, 'r') as f:
         data = yaml.load(f)
     try:
