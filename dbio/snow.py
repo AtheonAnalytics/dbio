@@ -29,7 +29,6 @@ class SnowflakeConnection(DBConnection):
         with self.cursor() as cursor:
             filename = os.path.basename(file_path)
             cursor.execute('use database {};'.format(schema))
-            cursor.execute('create or replace stage etl_stage;')
             cursor.execute('put file:///{} @etl_stage/{};'.format(file_path, filename))
             cursor.execute('copy into {} from @etl_stage/{}'
                            ' file_format=(type=csv field_optionally_enclosed_by=\'"\')'
