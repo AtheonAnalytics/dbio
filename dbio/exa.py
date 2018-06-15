@@ -26,7 +26,14 @@ class ExasolConnection(DBConnection):
             conn.writeData(
                 data_frame, table=table_path, chunksize=1000, columnNames=columns, encoding='utf8')
 
-    def read(self, schema, query):
+    def read_pandas(self, schema, query):
         with self.connection() as conn:
             conn.execute('open schema {};'.format(schema))
             return conn.readData(sqlCommand=query)
+
+    def read(self, schema, query):
+        with self.cursor() as cursor:
+            cursor.execute('open schema {};'.format(schema))
+            cursor.execute(query)
+            fields = map(lambda x: x[0], cursor.description)
+            return [dict(zip(fields, row)) for row in cursor.fetchall()]
