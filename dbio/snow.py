@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
+from collections import OrderedDict
 
 import snowflake.connector
 
@@ -39,4 +40,5 @@ class SnowflakeConnection(DBConnection):
             cursor.execute('use database {}'.format(schema))
             cursor.execute(query)
             fields = map(lambda x: x[0], cursor.description)
-            return [dict(zip(fields, row)) for row in cursor.fetchall()]
+            return [OrderedDict(zip(fields, row)) for row in cursor.fetchall()]
+

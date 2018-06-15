@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 import exasol
 
 from dbio.base import DBConnection
@@ -36,4 +38,4 @@ class ExasolConnection(DBConnection):
             cursor.execute('open schema {};'.format(schema))
             cursor.execute(query)
             fields = map(lambda x: x[0], cursor.description)
-            return [dict(zip(fields, row)) for row in cursor.fetchall()]
+            return [OrderedDict(zip(fields, row)) for row in cursor.fetchall()]
