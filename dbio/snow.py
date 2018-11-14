@@ -26,19 +26,30 @@ class SnowflakeConnection(DBConnection):
             role=role,
         )
 
-    def write_csv(self, file_path, table, schema):
+    def write_csv(self, file_path, table, schema, columns=None):
+        if columns is not None:
+            columns_str = '({})'.format(', '.join(columns))
+        else: columns_str = ''
         with self.cursor() as cursor:
             filename = os.path.basename(file_path)
             cursor.execute('use database {};'.format(schema))
             cursor.execute('put file:///{} @etl_stage/{};'.format(file_path, filename))
-            cursor.execute('copy into {} from @etl_stage/{}'
+            cursor.execute('copy into {} {} from @etl_stage/{}'
                            ' file_format=(type=csv field_optionally_enclosed_by=\'"\')'
-                           ' purge=true;'.format(table, filename))
+                           ' purge=true;'.format(table, columns_str, filename))
 
     def read(self, schema, query):
         with self.cursor() as cursor:
             cursor.execute('use database {}'.format(schema))
             cursor.execute(query)
             fields = map(lambda x: x[0], cursor.description)
-            return [OrderedDict(zip(fields, row)) for row in cursor.fetchall()]
+            data = OrderedDict()
+            row_data = cursor.fetchall()
+            if row_data == []:
+                return OrderedDict([(f, []) for f in fields])
+
+            column_data = zip(*row_data)
+            for i, c in enumerate(fields):
+                data[c] = list(column_data[i])
+            return data
 

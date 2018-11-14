@@ -26,7 +26,7 @@ class DBConnection(object):
         """
         raise NotImplementedError
 
-    def write_csv(self, file_path, table, schema):
+    def write_csv(self, file_path, table, schema, columns=None):
         """
         Abstract method to write csv to database.
 
@@ -50,10 +50,11 @@ class DBConnection(object):
             schema(str): schema in db
 
         """
+        columns = data_frame.columns.tolist()
         with tempfile.NamedTemporaryFile() as temp_file:
             data_frame.to_csv(temp_file, index=False, header=None, quoting=csv.QUOTE_MINIMAL, encoding='utf8')
             temp_file.flush()
-            self.write_csv(temp_file.name, table, schema)
+            self.write_csv(temp_file.name, table, schema, columns=columns)
 
     def read(self, schema, query):
         """
