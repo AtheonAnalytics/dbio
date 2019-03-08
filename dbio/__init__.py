@@ -6,5 +6,5 @@ __author__ = """Samuel Luen-English"""
 __email__ = 'sam.luenenglish@atheon.co.uk'
 __version__ = '0.0.0'
 
-from main import db_connection
+from .main import db_connection
 

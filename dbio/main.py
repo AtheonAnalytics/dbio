@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from exa import ExasolConnection
-from snow import SnowflakeConnection
-from utils import get_config
+from .exa import ExasolConnection
+from .snow import SnowflakeConnection
+from .utils import get_config
 
 
 def db_connection(connection_name):

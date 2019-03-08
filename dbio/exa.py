@@ -37,5 +37,5 @@ class ExasolConnection(DBConnection):
         with self.cursor() as cursor:
             cursor.execute('open schema {};'.format(schema))
             cursor.execute(query)
-            fields = map(lambda x: x[0], cursor.description)
-            return [OrderedDict(zip(fields, row)) for row in cursor.fetchall()]
+            fields = [x[0] for x in cursor.description]
+            return [OrderedDict(list(zip(fields, row))) for row in cursor.fetchall()]

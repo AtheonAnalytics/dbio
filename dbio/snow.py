@@ -42,13 +42,13 @@ class SnowflakeConnection(DBConnection):
         with self.cursor() as cursor:
             cursor.execute('use database {}'.format(schema))
             cursor.execute(query)
-            fields = map(lambda x: x[0], cursor.description)
+            fields = [x[0] for x in cursor.description]
             data = OrderedDict()
             row_data = cursor.fetchall()
             if row_data == []:
                 return OrderedDict([(f, []) for f in fields])
 
-            column_data = zip(*row_data)
+            column_data = list(zip(*row_data))
             for i, c in enumerate(fields):
                 data[c] = list(column_data[i])
             return data
