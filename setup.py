@@ -9,7 +9,7 @@ requirements = [
     'pandas',
     'PyYAML',
     'pyodbc',
-    'exasol',
+    'pyexasol[pandas]',
     'snowflake-connector-python',
 ]
 setup_requirements = [
