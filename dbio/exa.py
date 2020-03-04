@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 
-import exasol
+import pyexasol.db2 as E
 
 from dbio.base import DBConnection
 from dbio.utils import get_config
@@ -11,27 +11,23 @@ from dbio.utils import get_config
 class ExasolConnection(DBConnection):
 
     def _connect(self):
-        return exasol.connect(
-            DRIVER=get_config(self.connection_name, 'driver'),
-            EXAHOST=get_config(self.connection_name, 'EXAHOST'),
-            EXAUID=get_config(self.connection_name, 'EXAUID'),
-            EXAPWD=get_config(self.connection_name, 'EXAPWD'),
-            ENCRYPTION=get_config(self.connection_name, 'ENCRYPTION'),
-            autocommit=True,
-            CONNECTIONLCALL='C.UTF-8')
+        return E.connect(dsn=get_config(self.connection_name, 'EXAHOST'),
+                         user=get_config(self.connection_name, 'EXAUID'),
+                         password=get_config(self.connection_name, 'EXAPWD'))
 
     def write_pandas(self, data_frame, table, schema):
-        table_path = '{}.{}'.format(schema, table)
+        table_path = (schema, table)
         columns = data_frame.columns.tolist()
 
         with self.connection() as conn:
-            conn.writeData(
-                data_frame, table=table_path, chunksize=1000, columnNames=columns, encoding='utf8')
+            conn.import_from_pandas(
+                data_frame, table_path, callback_params={'chunksize': 1000, 'columns': columns,
+                                                         'encoding': 'utf-8'})
 
     def read_pandas(self, schema, query):
         with self.connection() as conn:
             conn.execute('open schema {};'.format(schema))
-            return conn.readData(sqlCommand=query)
+            return conn.export_to_pandas(query)
 
     def read(self, schema, query):
         with self.cursor() as cursor:

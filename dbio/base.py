@@ -51,7 +51,7 @@ class DBConnection(object):
 
         """
         columns = data_frame.columns.tolist()
-        with tempfile.NamedTemporaryFile() as temp_file:
+        with tempfile.NamedTemporaryFile(mode='w') as temp_file:
             data_frame.to_csv(temp_file, index=False, header=None, quoting=csv.QUOTE_MINIMAL, encoding='utf8')
             temp_file.flush()
             self.write_csv(temp_file.name, table, schema, columns=columns)
