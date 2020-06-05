@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 requirements = [
     'pandas',
     'PyYAML',
-    'pyodbc',
+    # 'pyodbc',
     'snowflake-connector-python',
 ]
 setup_requirements = [
