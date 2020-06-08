@@ -9,7 +9,6 @@ requirements = [
     'pandas',
     'PyYAML',
     'pyodbc',
-    'pyexasol',
     'snowflake-connector-python',
 ]
 setup_requirements = [
@@ -42,5 +41,5 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    version='3.0.1',
+    version='3.1.0',
 )
