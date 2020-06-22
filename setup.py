@@ -8,7 +8,6 @@ from setuptools import setup, find_packages
 requirements = [
     'pandas',
     'PyYAML',
-    'pyodbc',
     'snowflake-connector-python',
 ]
 setup_requirements = [
@@ -41,5 +40,5 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    version='3.1.0',
+    version='3.2.0',
 )
